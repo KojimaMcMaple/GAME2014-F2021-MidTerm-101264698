@@ -2,16 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Responsible for moving the individual bullets
+/// </summary>
 public class BulletController : MonoBehaviour, IApplyDamage
 {
-    public float verticalSpeed;
-    public float verticalBoundary;
+    public float moveSpeed = 4.0f;
+    public float moveBoundary = 5.1f;
     public BulletManager bulletManager;
     public int damage;
     
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
+        Bounds sprite_bounds = GetComponent<SpriteRenderer>().sprite.bounds;
+        Vector3 top_right_max_pos = Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0));
+        moveBoundary = (Mathf.Abs(top_right_max_pos.x) + (sprite_bounds.extents.x * transform.localScale.x)); //find the screen bounds in world, then substract the sprite size to set bounds
         bulletManager = FindObjectOfType<BulletManager>();
     }
 
@@ -24,12 +29,12 @@ public class BulletController : MonoBehaviour, IApplyDamage
 
     private void _Move()
     {
-        transform.position += new Vector3(0.0f, verticalSpeed, 0.0f) * Time.deltaTime;
+        transform.position += new Vector3(moveSpeed, 0.0f, 0.0f) * Time.deltaTime;
     }
 
     private void _CheckBounds()
     {
-        if (transform.position.y > verticalBoundary)
+        if (transform.position.x > moveBoundary)
         {
             bulletManager.ReturnBullet(gameObject);
         }

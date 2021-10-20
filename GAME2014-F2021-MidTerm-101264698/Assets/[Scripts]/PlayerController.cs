@@ -24,9 +24,10 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
+        Bounds sprite_bounds = GetComponent<SpriteRenderer>().sprite.bounds;
         Vector3 top_right_max_pos = Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0));
-        Vector3 left_down_max_pos = Camera.main.ViewportToWorldPoint(new Vector3(0, 0, 0));
-        moveBoundary = Mathf.Abs(top_right_max_pos.y) + Mathf.Abs(left_down_max_pos.y);
+        //Vector3 left_down_max_pos = Camera.main.ViewportToWorldPoint(new Vector3(0, 0, 0));
+        moveBoundary = (Mathf.Abs(top_right_max_pos.y) - (sprite_bounds.extents.y * transform.localScale.y)); //find the screen bounds in world, then substract the sprite size to set bounds
         m_touchesEnded = new Vector3();
         m_rigidBody = GetComponent<Rigidbody2D>();
     }
@@ -111,6 +112,8 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void _CheckBounds()
     {
+        Debug.Log(transform.position.y);
+        Debug.Log(moveBoundary);
         // check right bounds
         if (transform.position.y >= moveBoundary)
         {
@@ -127,12 +130,15 @@ public class PlayerController : MonoBehaviour
 
     void OnDrawGizmosSelected()
     {
+        Bounds sprite_bounds = GetComponent<SpriteRenderer>().sprite.bounds;
         Camera camera = Camera.main;
         Vector3 p = camera.ViewportToWorldPoint(new Vector3(1, 1, 0));
         Vector3 p2 = camera.ViewportToWorldPoint(new Vector3(0, 0, 0));
         Gizmos.color = Color.blue;
-        Gizmos.DrawSphere(p, 1.0F);
+        Gizmos.DrawSphere(p, sprite_bounds.size.y * transform.localScale.y);
         Gizmos.color = Color.red;
-        Gizmos.DrawSphere(p2, 1.0F);
+        Gizmos.DrawSphere(p2, sprite_bounds.size.y * transform.localScale.y);
+        Gizmos.color = Color.green;
+        Gizmos.DrawSphere(new Vector3(0, Mathf.Abs(p.y) - sprite_bounds.extents.y * transform.localScale.y, 0), sprite_bounds.extents.y * transform.localScale.y);
     }
 }
