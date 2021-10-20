@@ -9,9 +9,6 @@ public class PlayerController : MonoBehaviour
 {
     public BulletManager bulletManager;
 
-    [Header("Boundary Check")]
-    public float moveBoundary = 1.9f;
-
     [Header("Player Speed")]
     public float moveSpeed = 2.0f;
     public float maxSpeed = 6.0f;
@@ -23,10 +20,13 @@ public class PlayerController : MonoBehaviour
     // Private variables
     private Rigidbody2D m_rigidBody;
     private Vector3 m_touchesEnded;
+    [Header("Boundary Check")] private float moveBoundary = 1.9f;
 
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
+        Vector3 top_right_max_pos = Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0));
+        Vector3 left_down_max_pos = Camera.main.ViewportToWorldPoint(new Vector3(0, 0, 0));
+        moveBoundary = Mathf.Abs(top_right_max_pos.y) + Mathf.Abs(left_down_max_pos.y);
         m_touchesEnded = new Vector3();
         m_rigidBody = GetComponent<Rigidbody2D>();
     }
@@ -123,5 +123,16 @@ public class PlayerController : MonoBehaviour
             transform.position = new Vector3(transform.position.x, -moveBoundary, 0.0f);
         }
 
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Camera camera = Camera.main;
+        Vector3 p = camera.ViewportToWorldPoint(new Vector3(1, 1, 0));
+        Vector3 p2 = camera.ViewportToWorldPoint(new Vector3(0, 0, 0));
+        Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(p, 1.0F);
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(p2, 1.0F);
     }
 }
