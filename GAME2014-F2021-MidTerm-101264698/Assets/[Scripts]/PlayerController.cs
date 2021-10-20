@@ -28,21 +28,23 @@ public class PlayerController : MonoBehaviour
     // Private variables
     private Rigidbody2D m_rigidBody;
     private Vector3 m_touchesEnded;
+    private GameManager game_manager_;
     [Header("Boundary Check")] private float moveBoundary = 1.9f;
 
-    void Awake()
+    void Start() //to wait for Screen orientation set from GameManager
     {
+        game_manager_ = FindObjectOfType<GameManager>();
+
         Bounds sprite_bounds = GetComponent<SpriteRenderer>().sprite.bounds;
-        Vector3 top_right_max_pos = Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0));
-        //Vector3 left_down_max_pos = Camera.main.ViewportToWorldPoint(new Vector3(0, 0, 0));
-        moveBoundary = (Mathf.Abs(top_right_max_pos.y) - (sprite_bounds.extents.y * transform.localScale.y)); //find the screen bounds in world, then substract the sprite size to set bounds
+        moveBoundary = (Mathf.Abs(game_manager_.GetTopRightMaxPos().y) - (sprite_bounds.extents.y * transform.localScale.y)); //find the screen bounds in world, then substract the sprite size to set bounds
+        
         m_touchesEnded = new Vector3();
         m_rigidBody = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
     void Update()
     {
+        _SetXPosOnScreenOrientation();
         _Move();
         _CheckBounds();
         _FireBullet();
@@ -120,8 +122,6 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void _CheckBounds()
     {
-        Debug.Log(transform.position.y);
-        Debug.Log(moveBoundary);
         // check right bounds
         if (transform.position.y >= moveBoundary)
         {
@@ -134,6 +134,39 @@ public class PlayerController : MonoBehaviour
             transform.position = new Vector3(transform.position.x, -moveBoundary, 0.0f);
         }
 
+    }
+
+    /// <summary>
+    /// Sets the x pos based on screen orientation
+    /// </summary>
+    private void _SetXPosOnScreenOrientation()
+    {
+        //ship pos  / screen world pos max              = what percentage of the screen the ship should be positioned at 
+        //-7.34     / 10.55556 (Samsung Galaxy S10+)    = 0.69536812826     = 0.7f rounded
+        switch (Screen.orientation)
+        {
+            case ScreenOrientation.Portrait:
+            case ScreenOrientation.PortraitUpsideDown:
+                transform.position = new Vector3(game_manager_.GetTopRightMaxPos().y / game_manager_.GetScreenAspect() * -0.7f, 
+                                                    transform.position.y, transform.position.z); //player will always be 70% to the left, has to divide by GetScreenAspect or ship will go off screen
+                break;
+            case ScreenOrientation.LandscapeLeft:
+            case ScreenOrientation.LandscapeRight:
+                transform.position = new Vector3(game_manager_.GetTopRightMaxPos().x * -0.7f, 
+                                                    transform.position.y, transform.position.z); //player will always be 70% to the left
+                break;
+            default:
+                break;
+        }
+        //if (Time.frameCount % 180 == 0)
+        //{
+        //    Debug.Log("> orientation: " + Screen.orientation);
+        //    Debug.Log(">> width: " + Screen.width);
+        //    Debug.Log(">>> height: " + Screen.height);
+        //    Debug.Log(">>>> top_right_max_pos.x: " + game_manager_.GetTopRightMaxPos().x);
+        //    Debug.Log(">>>>> top_right_max_pos.y: " + game_manager_.GetTopRightMaxPos().y);
+        //    Debug.Log(">>>>>> aspect: " + game_manager_.GetScreenAspect());
+        //}
     }
 
     /// <summary>

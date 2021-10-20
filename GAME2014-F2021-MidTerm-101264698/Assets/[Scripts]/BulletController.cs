@@ -20,16 +20,17 @@ public class BulletController : MonoBehaviour, IApplyDamage
     public float moveBoundary = 5.1f;
     public BulletManager bulletManager;
     public int damage;
-    
-    void Awake()
+
+    private GameManager game_manager_;
+
+    void Start() //to wait for Screen orientation set from GameManager
     {
+        game_manager_ = FindObjectOfType<GameManager>();
         Bounds sprite_bounds = GetComponent<SpriteRenderer>().sprite.bounds;
-        Vector3 top_right_max_pos = Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0));
-        moveBoundary = (Mathf.Abs(top_right_max_pos.x) + (sprite_bounds.extents.x * transform.localScale.x)); //find the screen bounds in world, then substract the sprite size to set bounds
+        moveBoundary = (Mathf.Abs(game_manager_.GetTopRightMaxPos().x) + (sprite_bounds.extents.x * transform.localScale.x)); //find the screen bounds in world, then substract the sprite size to set bounds
         bulletManager = FindObjectOfType<BulletManager>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         _Move();

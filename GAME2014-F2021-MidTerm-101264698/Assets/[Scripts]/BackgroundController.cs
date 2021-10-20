@@ -16,21 +16,20 @@ public class BackgroundController : MonoBehaviour
     public float moveSpeed = 2f;
     public float moveBoundary = 10f;
     [SerializeField] private bool is_second_bkg_ = false;
+    private GameManager game_manager_;
 
-    void Awake()
+    void Start() //to wait for Screen orientation set from GameManager
     {
+        game_manager_ = FindObjectOfType<GameManager>();
         Bounds sprite_bounds = GetComponent<SpriteRenderer>().sprite.bounds;
-        Vector3 top_right_max_pos = Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0));
-        Vector3 bottom_left_max_pos = Camera.main.ViewportToWorldPoint(new Vector3(0, 0, 0));
-        moveBoundary = (Mathf.Abs(bottom_left_max_pos.x) + (sprite_bounds.extents.x * transform.localScale.x)); //find the screen bounds in world, then add the sprite size to set bounds
+        moveBoundary = (Mathf.Abs(game_manager_.GetBottomLeftMaxPos().x) + (sprite_bounds.extents.x * transform.localScale.x)); //find the screen bounds in world, then add the sprite size to set bounds
         transform.position = new Vector3(0, 0, 0);
         if (is_second_bkg_)
         {
-            transform.position = new Vector3(top_right_max_pos.x + (sprite_bounds.extents.x * transform.localScale.x), 0, 0);
+            transform.position = new Vector3(game_manager_.GetTopRightMaxPos().x + (sprite_bounds.extents.x * transform.localScale.x), 0, 0);
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
         _Move();
