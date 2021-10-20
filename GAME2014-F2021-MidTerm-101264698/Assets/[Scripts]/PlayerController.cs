@@ -1,9 +1,17 @@
-﻿using System.Collections;
+﻿/// <summary>
+/// Source file Name: PlayerController.cs
+/// Student Name: Trung Le (Kyle)
+/// StudentID: 101264698 
+/// Date last Modified: 
+/// Program description: 
+/// Short Revision History: 
+/// </summary>
+
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEditor;
 using UnityEngine;
-
 
 public class PlayerController : MonoBehaviour
 {
@@ -128,6 +136,9 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Debug for screen positions
+    /// </summary>
     void OnDrawGizmosSelected()
     {
         Bounds sprite_bounds = GetComponent<SpriteRenderer>().sprite.bounds;
