@@ -22,12 +22,19 @@ public class BackgroundController : MonoBehaviour
     {
         game_manager_ = FindObjectOfType<GameManager>();
         Bounds sprite_bounds = GetComponent<SpriteRenderer>().sprite.bounds;
+        float scale_factor_x = (game_manager_.GetTopRightMaxPos().x / sprite_bounds.extents.x);
+        float scale_factor_y = (game_manager_.GetTopRightMaxPos().y / sprite_bounds.extents.y);
+        float scale_factor = scale_factor_x > scale_factor_y ? scale_factor_x : scale_factor_y;
+        transform.localScale = new Vector3(scale_factor, scale_factor, 1);
+        
         moveBoundary = (Mathf.Abs(game_manager_.GetBottomLeftMaxPos().x) + (sprite_bounds.extents.x * transform.localScale.x)); //find the screen bounds in world, then add the sprite size to set bounds
+        
         transform.position = new Vector3(0, 0, 0);
         if (is_second_bkg_)
         {
             transform.position = new Vector3(game_manager_.GetTopRightMaxPos().x + (sprite_bounds.extents.x * transform.localScale.x), 0, 0);
         }
+        
     }
 
     void Update()
